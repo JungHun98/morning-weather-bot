@@ -1,9 +1,10 @@
 export interface WeatherData {
   temp: number;
-  feelsLike: number;
+  feelsLike?: number;
   humidity: number;
   description: string;
   isUmbrellaNeeded: boolean;
+  rainProbability?: string;
 }
 
 export interface AirQualityData {

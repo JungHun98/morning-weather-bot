@@ -45,7 +45,7 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
             },
             {
               type: "TextBlock",
-              text: `체감 ${report.weather.feelsLike}°C`,
+              text: report.weather.feelsLike ? `체감 ${report.weather.feelsLike}°C` : `강수확률 ${report.weather.rainProbability}`,
               isSubtle: true,
               spacing: "None",
             }
@@ -81,6 +81,7 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
       type: "FactSet",
       facts: [
         { title: "날씨 상태", value: report.weather.description },
+        { title: "강수 확률", value: report.weather.rainProbability || "0%" },
         { title: "습도", value: `${report.weather.humidity}%` },
         { title: "초미세먼지", value: `${report.airQuality.pm25} μg/m³` }
       ],
