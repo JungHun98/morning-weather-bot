@@ -18,17 +18,13 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: morning-weather-bot/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd morning-weather-bot
-          npm ci
+        run: npm ci
 
       - name: Build TypeScript
-        run: |
-          cd morning-weather-bot
-          npm run build
+        run: npm run build
 
       - name: Run Bot
         env:
@@ -36,6 +32,4 @@ jobs:
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           AIRKOREA_API_KEY: ${{ secrets.AIRKOREA_API_KEY }}
           CITY: ${{ secrets.CITY || 'Seoul' }}
-        run: |
-          cd morning-weather-bot
-          npm start
+        run: npm start
