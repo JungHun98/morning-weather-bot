@@ -1,0 +1,41 @@
+name: Morning Weather Report
+
+on:
+  schedule:
+    - cron: '30 21 * * *' # 매일 아침 6:30 KST (UTC 21:30)
+  workflow_dispatch:      # 수동 실행 버튼 추가
+
+jobs:
+  weather-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: morning-weather-bot/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd morning-weather-bot
+          npm ci
+
+      - name: Build TypeScript
+        run: |
+          cd morning-weather-bot
+          npm run build
+
+      - name: Run Bot
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          AIRKOREA_API_KEY: ${{ secrets.AIRKOREA_API_KEY }}
+          CITY: ${{ secrets.CITY || 'Seoul' }}
+        run: |
+          cd morning-weather-bot
+          npm start
