@@ -19,8 +19,8 @@ export async function getKMAWeather(apiKey: string): Promise<{ current: WeatherD
   // 제공해주신 HTTPS 엔드포인트 사용
   const baseUrl = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
   
-  // 이미 인코딩된 키이므로 그대로 사용
-  const url = `${baseUrl}?serviceKey=${apiKey}&numOfRows=200&pageNo=1&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}&returnType=JSON`;
+  // 기상청 2.0 API는 returnType=JSON 또는 dataType=JSON을 요구합니다.
+  const url = `${baseUrl}?serviceKey=${apiKey}&numOfRows=200&pageNo=1&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}&dataType=JSON`;
 
   console.log(`📡 기상청 API 호출 중... (BaseDate: ${baseDate}, BaseTime: ${baseTime})`);
 
@@ -29,7 +29,14 @@ export async function getKMAWeather(apiKey: string): Promise<{ current: WeatherD
     throw new Error(`KMA API Error: ${response.status} (${response.statusText})`);
   }
 
-  const data = (await response.json()) as any;
+  const text = await response.text();
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    console.error('기상청 API 응답이 JSON 형식이 아닙니다:', text);
+    throw new Error('기상청 API 응답 파싱 실패 (XML 응답 가능성)');
+  }
   
   // API 응답 결과 코드 확인
   const resultCode = data.response?.header?.resultCode;

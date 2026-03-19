@@ -114,10 +114,9 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
   // 시간별 날씨 예보 추가
   if (report.weatherForecast && report.weatherForecast.length > 0) {
     const forecastRows = report.weatherForecast.map(f => {
-      const time = new Date(f.time).getHours();
       return {
         type: "TextBlock",
-        text: `[${time}시] ${f.temp}°C, ${f.description} ${f.isUmbrellaNeeded ? '☔' : '☀️'}`,
+        text: `[${f.time}] ${f.temp}°C, ${f.description} ${f.isUmbrellaNeeded ? '☔' : '☀️'}`,
         spacing: "None",
         size: "Small"
       };
