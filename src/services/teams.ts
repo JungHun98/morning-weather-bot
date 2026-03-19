@@ -2,23 +2,23 @@ import fetch from 'node-fetch';
 import { WeatherReport } from '../types';
 
 export async function sendTeamsReport(webhookUrl: string, report: WeatherReport): Promise<void> {
-  const isRainy = report.weather.isUmbrellaNeeded;
+  const isRainyEvening = report.eveningWeather.isUmbrellaNeeded;
   
   const bodyItems: any[] = [
     {
       type: "Container",
-      style: isRainy ? "attention" : "accent",
+      style: isRainyEvening ? "attention" : "accent",
       items: [
         {
           type: "TextBlock",
-          text: `📅 ${report.city} 아침 날씨 리포트`,
+          text: `🌇 ${report.city} 퇴근길 날씨 예보`,
           weight: "Bolder",
           size: "Large",
           color: "Default",
         },
         {
           type: "TextBlock",
-          text: report.timestamp,
+          text: `아침 리포트 (${report.timestamp})`,
           isSubtle: true,
           spacing: "None",
         }
@@ -34,18 +34,18 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
           items: [
             {
               type: "TextBlock",
-              text: "🌡️ 기온",
+              text: "🌇 퇴근(18시)",
               weight: "Bolder",
             },
             {
               type: "TextBlock",
-              text: `${report.weather.temp}°C`,
+              text: `${report.eveningWeather.temp}°C`,
               size: "ExtraLarge",
               color: "Accent",
             },
             {
               type: "TextBlock",
-              text: report.weather.feelsLike ? `체감 ${report.weather.feelsLike}°C` : `강수확률 ${report.weather.rainProbability}`,
+              text: report.eveningWeather.description,
               isSubtle: true,
               spacing: "None",
             }
@@ -78,40 +78,28 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
       spacing: "Medium"
     },
     {
-      type: "FactSet",
-      facts: [
-        { title: "날씨 상태", value: report.weather.description },
-        { title: "강수 확률", value: report.weather.rainProbability || "0%" },
-        { title: "습도", value: `${report.weather.humidity}%` },
-        { title: "초미세먼지", value: `${report.airQuality.pm25} μg/m³` }
-      ],
-      margin: "Medium"
-    }
-  ];
-
-  // 미세먼지 예보 추가
-  if (report.airQualityForecast) {
-    bodyItems.push({
       type: "Container",
       separator: true,
       spacing: "Medium",
       items: [
         {
           type: "TextBlock",
-          text: "🌬️ 미세먼지 예보 (오늘)",
+          text: "🌅 아침(현재) 날씨 정보",
           weight: "Bolder"
         },
         {
-          type: "TextBlock",
-          text: report.airQualityForecast.informOverall,
-          wrap: true,
-          size: "Small"
+          type: "FactSet",
+          facts: [
+            { title: "현재 기온", value: `${report.morningWeather.temp}°C (${report.morningWeather.description})` },
+            { title: "강수 확률", value: `출근 ${report.morningWeather.rainProbability} / 퇴근 ${report.eveningWeather.rainProbability}` },
+            { title: "습도", value: `${report.morningWeather.humidity}%` }
+          ]
         }
       ]
-    });
-  }
+    }
+  ];
 
-  // 시간별 날씨 예보 추가
+  // 시간별 흐름 추가
   if (report.weatherForecast && report.weatherForecast.length > 0) {
     const forecastRows = report.weatherForecast.map(f => {
       return {
@@ -129,7 +117,7 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
       items: [
         {
           type: "TextBlock",
-          text: "⏳ 향후 시간별 날씨 예보",
+          text: "⏳ 오늘 시간별 흐름",
           weight: "Bolder"
         },
         ...forecastRows
@@ -145,10 +133,10 @@ export async function sendTeamsReport(webhookUrl: string, report: WeatherReport)
     items: [
       {
         type: "TextBlock",
-        text: isRainy ? "☔ 오늘은 우산이 꼭 필요해요!" : "☀️ 우산 없이 가벼운 발걸음으로 시작하세요.",
+        text: isRainyEvening ? "☔ 오늘 퇴근길에 비 소식이 있어요. 우산 꼭 챙기세요!" : "☀️ 오늘 퇴근길은 우산 없이 가뿐할 것 같습니다.",
         weight: "Bolder",
         horizontalAlignment: "Center",
-        color: isRainy ? "Attention" : "Good"
+        color: isRainyEvening ? "Attention" : "Good"
       }
     ]
   });

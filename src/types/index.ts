@@ -27,7 +27,9 @@ export interface AirQualityForecast {
 
 export interface WeatherReport {
   city: string;
-  weather: WeatherData;
+  weather?: WeatherData; // 호환성을 위해 유지
+  morningWeather: WeatherData;
+  eveningWeather: WeatherData;
   airQuality: AirQualityData;
   weatherForecast?: ForecastData[];
   airQualityForecast?: AirQualityForecast;
