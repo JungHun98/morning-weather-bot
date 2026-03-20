@@ -2,7 +2,7 @@ name: Morning Weather Report
 
 on:
   schedule:
-    - cron: '30 21 * * *' # 매일 아침 6:30 KST (UTC 21:30)
+    - cron: '30 21 * * 0-4' # 평일(월~금) 아침 6:30 KST (UTC 일~목 21:30)
   workflow_dispatch:      # 수동 실행 버튼 추가
 
 jobs:
